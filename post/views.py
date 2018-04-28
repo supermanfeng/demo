@@ -1,3 +1,5 @@
+from math import ceil
+
 from django.shortcuts import render, redirect
 
 from post.models import Post
@@ -36,8 +38,17 @@ def read(request):
 
 
 def post_list(request):
-    posts = Post.objects.all()
-    return render(request, 'post_list.html', {'posts': posts})
+    # posts = Post.objects.all()
+    page = int(request.GET.get('page', 1))
+    total = Post.objects.count()
+    pages = ceil(total / 5)  # 总页数
+
+    start = (page - 1) * 5
+    end = start + 5
+    posts = Post.objects.all().order_by('-id')[start:end]
+
+    return render(request, 'post_list.html',
+                  {'posts': posts, 'pages': range(1, pages + 1)})
 
 
 def search(request):
