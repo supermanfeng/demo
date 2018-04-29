@@ -1,3 +1,5 @@
+# coding: utf-8
+
 """
 Django settings for demo project.
 
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'post',
+    'user',
 ]
 
 MIDDLEWARE = [
@@ -119,3 +122,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# 上传文件的配置
+MEDIA_URL = '/medias/'
+MEDIA_ROOT = 'medias'
