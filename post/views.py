@@ -2,9 +2,10 @@ from math import ceil
 
 from django.shortcuts import render, redirect
 
-from common.keys import POST_KEY
+from common.keys import POST_KEY, READ_COUNT_KEY
 from post.models import Post
 from post.helper import page_cache
+from post.helper import read_count
 
 
 def create(request):
@@ -33,6 +34,7 @@ def edit(request):
         return render(request, 'edit.html', {'post': post})
 
 
+@read_count
 @page_cache(3)
 def read(request):
     post_id = int(request.GET.get('post_id', 1))
@@ -58,3 +60,21 @@ def search(request):
     keyword = request.POST.get('keyword')
     posts = Post.objects.filter(content__contains=keyword)
     return render(request, 'search.html', {'posts': posts})
+
+
+def top10(request):
+    '''
+    排名 文章名                 阅读量
+    1   "The Zen of Python-32"  1000
+    2   "The Zen of Python-13"  900
+    3   "The Zen of Python-34"  879
+    4   "The Zen of Python-1"   767
+    5   "The Zen of Python-9"   646
+    6   "The Zen of Python-6"   432
+    7   "The Zen of Python-22"  321
+    8   "The Zen of Python-17"  121
+    9   "The Zen of Python-31"  90
+    10  "The Zen of Python-21"  71
+    '''
+    return render(request, 'top10.html', data)
+
