@@ -38,7 +38,6 @@ def read(request):
 
 
 def post_list(request):
-    # posts = Post.objects.all()
     page = int(request.GET.get('page', 1))
     total = Post.objects.count()
     pages = ceil(total / 5)  # 总页数
