@@ -1,5 +1,6 @@
 from math import ceil
 
+from django.core.cache import cache
 from django.shortcuts import render, redirect
 
 from post.models import Post
@@ -33,7 +34,11 @@ def edit(request):
 
 def read(request):
     post_id = int(request.GET.get('post_id', 1))
+    # 从缓存中获取
+    # 如果能取到直接返回
+    # 否则从数据库中获取，同时添加到缓存
     post = Post.objects.get(id=post_id)
+
     return render(request, 'read.html', {'post': post})
 
 
