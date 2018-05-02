@@ -30,6 +30,9 @@ urlpatterns = [
     url(r'^post/search/', post_views.search),
 
     url(r'^user/register/', user_views.register),
+    url(r'^user/login/', user_views.login),
+    url(r'^user/info/', user_views.user_info),
+    url(r'^user/logout/', user_views.logout),
 ]
 
 
