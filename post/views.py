@@ -6,6 +6,7 @@ from common.keys import POST_KEY, READ_COUNT_KEY
 from post.models import Post
 from post.helper import page_cache
 from post.helper import read_count
+from post.helper import get_top_n
 
 
 def create(request):
@@ -76,5 +77,6 @@ def top10(request):
     9   "The Zen of Python-31"  90
     10  "The Zen of Python-21"  71
     '''
-    return render(request, 'top10.html', data)
+    post_rank = get_top_n(10)
+    return render(request, 'top10.html', {'rank_data': post_rank})
 
