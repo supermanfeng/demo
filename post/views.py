@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from common.keys import POST_KEY, READ_COUNT_KEY
 from user.helper import login_required
 from post.models import Post
+from post.models import Comment
 from post.helper import page_cache
 from post.helper import read_count
 from post.helper import get_top_n
@@ -69,7 +70,7 @@ def search(request):
 
 def top10(request):
     '''
-    排名 文章名                 阅读量
+    排名 文章名                  阅读量
     1   "The Zen of Python-32"  1000
     2   "The Zen of Python-13"  900
     3   "The Zen of Python-34"  879
@@ -84,3 +85,13 @@ def top10(request):
     post_rank = get_top_n(10)
     return render(request, 'top10.html', {'rank_data': post_rank})
 
+
+@login_required
+def comment(request):
+    if request.method == 'POST':
+        uid = request.session['uid']
+        post_id = request.POST.get('post_id')
+        content = request.POST.get('content')
+        Comment.objects.create(uid=uid,post_id=post_id,content=content)
+        return redirect('/post/read/?post_id=%s' % post_id)
+    return redirect('/')

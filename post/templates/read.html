@@ -35,7 +35,8 @@
 <div>
     {% for comment in post.comments %}
     <p>
-        <div><strong>名称：</strong>{{comment.auth.nickname}}</div>
+        <div><strong>姓名：</strong>{{comment.auth.nickname}}</div>
+        <div><strong>时间：</strong>{{comment.create | date:"Y-m-d H:i:s"}}</div>
         <div><strong>内容：</strong>{{comment.content|safe|escape|linebreaks}}</div>
     </p>
     {% if not forloop.last %}<hr>{% endif %}
