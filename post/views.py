@@ -3,22 +3,26 @@ from math import ceil
 from django.shortcuts import render, redirect
 
 from common.keys import POST_KEY, READ_COUNT_KEY
+from user.helper import login_required
 from post.models import Post
 from post.helper import page_cache
 from post.helper import read_count
 from post.helper import get_top_n
 
 
+@login_required
 def create(request):
     if request.method == 'POST':
         title = request.POST.get('title')
         content = request.POST.get('content')
-        post = Post.objects.create(title=title, content=content)
+        uid = request.session['uid']
+        post = Post.objects.create(uid=uid, title=title, content=content)
         return redirect('/post/read/?post_id=%s' % post.id)
     else:
         return render(request, 'create.html')
 
 
+@login_required
 def edit(request):
     if request.method == 'POST':
         # 取出 post
