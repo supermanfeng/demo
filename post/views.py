@@ -95,3 +95,7 @@ def comment(request):
         Comment.objects.create(uid=uid,post_id=post_id,content=content)
         return redirect('/post/read/?post_id=%s' % post_id)
     return redirect('/')
+
+
+def tag_filter(request):
+    return render(request, 'search.html', {'posts': posts})

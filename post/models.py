@@ -19,6 +19,14 @@ class Post(models.Model):
     def comments(self):
         return Comment.objects.filter(post_id=self.id).order_by('-create')
 
+    def tags(self):
+        '''当前帖子所具有的 Tag'''
+        pass
+
+    def update_tags(self, tag_names):
+        '''更新当前帖子的标签'''
+        pass
+
 
 class Comment(models.Model):
     uid = models.IntegerField()
@@ -37,3 +45,27 @@ class Comment(models.Model):
         if not hasattr(self, '_post'):
             self._post = Post.objects.get(id=self.post_id)
         return self._post
+
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=64, unique=True)
+
+    def posts(self):
+        pass
+
+
+class PostTagRelation(models.Model):
+    '''
+    帖子和标签的关系表
+    post              tag
+    ------------------------
+    abc               python
+    abc               django
+    abc               linux
+    HelloWorld        python
+    HelloWorld        linux
+    HelloWorld        develop
+    '''
+    post_id = models.IntegerField()
+    tag_id = models.IntegerField()
