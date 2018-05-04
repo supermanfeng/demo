@@ -12,7 +12,7 @@ from post.helper import get_top_n
 
 
 @login_required
-@check_permission('manager')
+@check_permission('create_post')
 def create(request):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -25,6 +25,7 @@ def create(request):
 
 
 @login_required
+@check_permission('modify_post')
 def edit(request):
     if request.method == 'POST':
         # 取出 post
@@ -93,7 +94,7 @@ def top10(request):
 
 
 @login_required
-@check_permission('user')
+@check_permission('comment')
 def comment(request):
     if request.method == 'POST':
         uid = request.session['uid']
@@ -108,3 +109,11 @@ def tag_filter(request):
     tag_id = request.GET.get('tag_id')
     tag = Tag.objects.get(id=tag_id)
     return render(request, 'search.html', {'posts': tag.posts()})
+
+
+@login_required
+@check_permission('delete_post')
+def del_post(request):
+    post_id = request.GET.get('post_id')
+    Post.objects.get(id=post_id).delete()
+    return redirect('/')

@@ -3,7 +3,6 @@
 from django.shortcuts import redirect, render
 
 from user.models import User
-from user.models import Permission
 
 
 def login_required(view_func):
@@ -22,11 +21,8 @@ def check_permission(permission_name):
             uid = request.session['uid']
             user = User.objects.get(id=uid)
 
-            # 获取需要的权限
-            need_perm = Permission.objects.get(name=permission_name)
-
             # 权限检查
-            if user.perm.level >= need_perm.level:
+            if user.has_perm(permission_name):
                 return view_func(request)
             else:
                 return render(request, 'blockers.html')
