@@ -3,7 +3,7 @@ from math import ceil
 from django.shortcuts import render, redirect
 
 from common.keys import POST_KEY, READ_COUNT_KEY
-from user.helper import login_required
+from user.helper import login_required, check_permission
 from post.models import Post, Tag
 from post.models import Comment
 from post.helper import page_cache
@@ -12,6 +12,7 @@ from post.helper import get_top_n
 
 
 @login_required
+@check_permission('manager')
 def create(request):
     if request.method == 'POST':
         title = request.POST.get('title')
@@ -92,6 +93,7 @@ def top10(request):
 
 
 @login_required
+@check_permission('user')
 def comment(request):
     if request.method == 'POST':
         uid = request.session['uid']
