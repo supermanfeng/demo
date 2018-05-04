@@ -12,7 +12,10 @@ class Post(models.Model):
     @property
     def auth(self):
         if not hasattr(self, '_auth'):
-            # self._auth = User.objects.using(chose_db(self.uid)).get(id=self.uid)
+            # 数据库有数据分片时的操作
+            # db_name = chose_db(self.uid)  # 根据数据分片规则选择 uid 所在的数据库
+            # self._auth = User.objects.using(db_name).get(id=self.uid)
+
             self._auth = User.objects.get(id=self.uid)
         return self._auth
 
@@ -59,7 +62,6 @@ class Comment(models.Model):
         return self._post
 
 
-
 class Tag(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
@@ -75,7 +77,7 @@ class Tag(models.Model):
         old_tags = cls.objects.filter(name__in=tag_names)
         old_names = {t.name for t in old_tags}  # 已存在的 Tag.name
 
-        # 筛选并创建新的 tag
+        # 筛选并创建新的 tags
         new_names = set(tag_names) - old_names
         new_tags = [Tag(name=n) for n in new_names]
         cls.objects.bulk_create(new_tags)
@@ -87,6 +89,7 @@ class Tag(models.Model):
 class PostTagRelation(models.Model):
     '''
     帖子和标签的关系表
+
     post              tag
     ------------------------
     abc               python
