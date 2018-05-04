@@ -21,11 +21,23 @@ class Post(models.Model):
 
     def tags(self):
         '''当前帖子所具有的 Tag'''
-        pass
+        relations = PostTagRelation.objects.filter(post_id=self.id).only('tag_id')
+        tag_id_list = [r.tag_id for r in relations]
+        return Tag.objects.filter(id__in=tag_id_list)
 
     def update_tags(self, tag_names):
         '''更新当前帖子的标签'''
-        pass
+        tag_names = set(tag_names)
+        current_tags = self.tags()
+        current_tag_names = {t.name for t in current_tags}
+
+        # 创建新的关系
+        new_relation_tag_names = tag_names - current_tag_names
+        PostTagRelation.add_post_tags(self.id, new_relation_tag_names)
+
+        # 删除旧的关系
+        old_relation_tag_names = current_tag_names - tag_names
+        PostTagRelation.del_post_tags(self.id, old_relation_tag_names)
 
 
 class Comment(models.Model):
@@ -52,7 +64,24 @@ class Tag(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
     def posts(self):
-        pass
+        relations = PostTagRelation.objects.filter(tag_id=self.id).only('post_id')
+        post_id_list = [r.post_id for r in relations]
+        return Post.objects.filter(id__in=post_id_list)
+
+    @classmethod
+    def ensure_tags(cls, tag_names):
+        '''确保 tag 已存在'''
+        # 先取出已存在的 tags
+        old_tags = cls.objects.filter(name__in=tag_names)
+        old_names = {t.name for t in old_tags}  # 已存在的 Tag.name
+
+        # 筛选并创建新的 tag
+        new_names = set(tag_names) - old_names
+        new_tags = [Tag(name=n) for n in new_names]
+        cls.objects.bulk_create(new_tags)
+
+        # 返回全部的 tags
+        return cls.objects.filter(name__in=tag_names)
 
 
 class PostTagRelation(models.Model):
@@ -69,3 +98,17 @@ class PostTagRelation(models.Model):
     '''
     post_id = models.IntegerField()
     tag_id = models.IntegerField()
+
+    @classmethod
+    def add_post_tags(cls, post_id, tag_names):
+        '''为 post_id 添加新的 tag 的对应关系'''
+        tags = Tag.ensure_tags(tag_names)
+        new_relations = [PostTagRelation(post_id=post_id, tag_id=t.id) for t in tags]
+        cls.objects.bulk_create(new_relations)
+
+    @classmethod
+    def del_post_tags(cls, post_id, tag_names):
+        '''删除与 post_id 有关联的 tag 的关系'''
+        tags = Tag.objects.filter(name__in=tag_names).only('id')
+        tag_id_list = [t.id for t in tags]
+        cls.objects.filter(post_id=post_id, tag_id__in=tag_id_list).delete()
